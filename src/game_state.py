@@ -13,6 +13,8 @@ class GameSettings:
         self.time_limit = TIME_LIMITS[self.difficulty]
         self.show_roma = True
         self.furigana = True
+        self.se_volume = 0.8
+        self.bgm_volume = 0.6
 
     def apply_difficulty(self, diff: str):
         self.difficulty = diff

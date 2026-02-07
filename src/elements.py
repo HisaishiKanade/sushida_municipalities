@@ -1,5 +1,8 @@
 import pygame
 from .config import *
+from .resources import Resources
+
+
 
 class UIElement:
     """所有 UI 组件的基类"""
@@ -40,10 +43,11 @@ class TextLabel(UIElement):
 
 class Button(UIElement):
     """普通按钮"""
-    def __init__(self, x, y, w, h, text, callback=None, font_size=28):
+    def __init__(self, x, y, w, h, text, callback=None, font_size=28, click_sound="button"):
         super().__init__(x, y, w, h)
         self.text = text
         self.callback = callback  # 点击后执行的函数
+        self.click_sound = click_sound
         self.font = pygame.font.Font(FONT_PATH, font_size)
         self.is_hovered = False
         
@@ -76,21 +80,29 @@ class Button(UIElement):
             screen.blit(text_surf, text_rect)
 
     def handle_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1 and self.is_hovered: # 左键点击
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if self.rect.collidepoint(event.pos):
+                if self.click_sound:
+                    Resources.play_se(self.click_sound)
                 if self.callback:
-                    self.callback() # 执行回调函数
-
+                    self.callback()
 
 class OptionBox(UIElement):
     """设置选项框：点击循环切换选项"""
-    def __init__(self, x, y, w, h, options, default_index=0, label=""):
+    def __init__(
+    self, x, y, w, h,
+    options,
+    default_index=0,
+    label="",
+    label_color=WHITE
+):
         super().__init__(x, y, w, h)
         self.options = options # 例如 ["EASY", "MEDIUM", "HARD"]
         self.index = default_index
         self.label = label # 选项左边的说明文字，例如 "难度:"
         self.font = pygame.font.Font(FONT_PATH, 28)
         self.is_hovered = False
+        self.label_color = label_color
 
     def get_value(self):
         """获取当前选中的值"""
@@ -103,7 +115,7 @@ class OptionBox(UIElement):
     def draw(self, screen):
         # 1. 绘制左侧说明文字
         if self.label:
-            label_surf = self.font.render(self.label, True, WHITE)
+            label_surf = self.font.render(self.label, True, self.label_color)
             # 文字画在按钮左侧 10 像素处
             screen.blit(label_surf, (self.rect.x - label_surf.get_width() - 15, self.rect.y + 10))
 
@@ -126,5 +138,70 @@ class OptionBox(UIElement):
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1 and self.is_hovered:
+                Resources.play_se("button")
                 # 循环切换下一个选项
                 self.index = (self.index + 1) % len(self.options)
+
+class Slider(UIElement):
+    """简单滑条：值范围 0.0 ~ 1.0"""
+    def __init__(self, x, y, w, h, label="", default_value=1.0, label_color=WHITE):
+        super().__init__(x, y, w, h)
+        self.label = label
+        self.value = max(0.0, min(1.0, float(default_value)))
+        self.font = pygame.font.Font(FONT_PATH, 24)
+        self.dragging = False
+        self.label_color = label_color
+
+        # 轨道和旋钮尺寸
+        self.track_h = 8
+        self.knob_r = 12
+
+    def get_value(self):
+        return self.value
+
+    def _value_from_mouse(self, mx):
+        left = self.rect.x
+        right = self.rect.x + self.rect.w
+        t = (mx - left) / max(1, (right - left))
+        self.value = max(0.0, min(1.0, t))
+
+    def update(self):
+        pass
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            mx, my = event.pos
+            if self.rect.collidepoint((mx, my)):
+                self.dragging = True
+                self._value_from_mouse(mx)
+
+        elif event.type == pygame.MOUSEMOTION:
+            if self.dragging:
+                mx, my = event.pos
+                self._value_from_mouse(mx)
+
+        elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+            self.dragging = False
+
+    def draw(self, screen):
+        # label
+        if self.label:
+            label_surf = self.font.render(self.label, True, self.label_color)
+            screen.blit(label_surf, (self.rect.x - label_surf.get_width() - 15, self.rect.y + 6))
+
+        # track
+        track_y = self.rect.y + (self.rect.h // 2) - (self.track_h // 2)
+        track_rect = pygame.Rect(self.rect.x, track_y, self.rect.w, self.track_h)
+        pygame.draw.rect(screen, WOOD_LIGHT, track_rect, border_radius=6)
+        pygame.draw.rect(screen, WHITE, track_rect, 2, border_radius=6)
+
+        # knob
+        knob_x = int(self.rect.x + self.value * self.rect.w)
+        knob_y = self.rect.y + self.rect.h // 2
+        pygame.draw.circle(screen, GOLD, (knob_x, knob_y), self.knob_r)
+        pygame.draw.circle(screen, WHITE, (knob_x, knob_y), self.knob_r, 2)
+
+        # value text
+        vtxt = f"{int(self.value * 100)}%"
+        v_surf = self.font.render(vtxt, True, WHITE)
+        screen.blit(v_surf, (self.rect.x + self.rect.w + 10, self.rect.y + 6))

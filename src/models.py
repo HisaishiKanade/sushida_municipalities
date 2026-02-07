@@ -20,7 +20,7 @@ ROMA_MAP = {
     'わ':['wa'], 'を':['wo'],
 
     # 拨音（n 的特殊规则在逻辑里处理）
-    'ん':['nn','xn','n'],
+    'ん':['n','nn','xn'],
 
     # 濁音・半濁音
     'が':['ga'], 'ぎ':['gi'], 'ぐ':['gu'], 'げ':['ge'], 'ご':['go'],
@@ -348,5 +348,5 @@ class SushiPlate:
             screen.blit(self.image, (curr_x, curr_y))
 
         # 2. 汉字
-        k_surf = fonts['kanji'].render(self.kanji, True, (40, 40, 40))
-        screen.blit(k_surf, (curr_x + 110 - k_surf.get_width() // 2, curr_y + 40))
+        # k_surf = fonts['kanji'].render(self.kanji, True, (40, 40, 40))
+        # screen.blit(k_surf, (curr_x + 110 - k_surf.get_width() // 2, curr_y + 40))
