@@ -28,7 +28,7 @@ class TitleScene(Scene):
         # 标题
         self.background = Resources.get_img("open_bg")
         self.title = TextLabel(WIDTH//2, 200, "寿司打", font_size=80, color=SAKURA)
-        self.subtitle = TextLabel(WIDTH//2, 250, "Test Ver.0.3", font_size=30, color=SALMON)
+        self.subtitle = TextLabel(WIDTH//2, 250, "自治体 Ver.0.3", font_size=30, color=SALMON)
         
         # 开始按钮
         self.btn_start = Button(WIDTH//2 - 100, 290, 200, 60, "スタート", 
@@ -67,7 +67,7 @@ class OptionScene(Scene):
         # 难度选择
         self.opt_diff = OptionBox(WIDTH//2 - 100, 180, 200, 50, 
                                   options=["EASY", "MEDIUM", "HARD"], 
-                                  label="難易度:", label_color=SAKURA)
+                                  label="難易度:", label_color="BLACK")
 
                                   
         # 罗马音显示开关（根据当前 settings 初始化）
@@ -87,7 +87,7 @@ class OptionScene(Scene):
         # ✅新增：音量滑条（SE / BGM）
         self.sld_se = Slider(WIDTH//2 - 100, 360, 220, 40,
                              label="SE:",
-                             default_value=getattr(self.settings, "se_volume", 0.8), label_color=SAKURA)
+                             default_value=getattr(self.settings, "se_volume", 0.8), label_color="BLACK")
         self.sld_bgm = Slider(WIDTH//2 - 100, 410, 220, 40,
                               label="BGM:",
                               default_value=getattr(self.settings, "bgm_volume", 0.6), label_color="BLACK")

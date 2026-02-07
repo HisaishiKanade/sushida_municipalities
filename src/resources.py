@@ -1,6 +1,12 @@
 import pygame
+import sys
 import os
 from .config import WIDTH, HEIGHT, BASE_DIR
+
+def resource_path(*parts):
+    # PyInstaller onefile 会把资源解到 sys._MEIPASS
+    base = getattr(sys, "_MEIPASS", os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+    return os.path.join(base, *parts)
 
 class Resources:
     _images = {}
@@ -15,7 +21,7 @@ class Resources:
     @classmethod
     def load_all(cls):
         """统一加载所有素材"""
-        assets_dir = os.path.join(BASE_DIR, "assets")
+        assets_dir = resource_path("assets")
 
         # 1. 加载背景图（统一放到 assets/bg）
         bg_dir = os.path.join(assets_dir, "bg")
