@@ -3,7 +3,9 @@
 一个基于 **pygame** 实现的日文打字游戏，灵感来自经典游戏「寿司打」，  
 结合 **日本全国自治体名称** 作为打字素材，并加入了完整的 **音效 / BGM / UI 系统**。
 
-> 当前版本：Test Ver. 0.2
+> 当前版本：Test Ver. 0.3
+>
+> 下载页面：https://github.com/HisaishiKanade/sushida_municipalities/releases
 
 ---
 
